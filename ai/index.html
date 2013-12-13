@@ -1,0 +1,222 @@
+<html><head>
+		<link href="../css/flipclock.css" rel="stylesheet">
+		
+		<script src="jquery-1.10.2.min.js"></script>
+	<style type="text/css">
+		* {cursor: none;}
+
+		#wrapper {
+			display: block !important;
+			width: 850px;
+			margin: 200px auto !important;
+			text-align: center;
+		}
+		#team {
+			position: absolute;
+			font-size:50em;
+			font-weight: bold;
+			top:-200px;
+			color: #EEEEEE;
+			font-family: Arial;
+			letter-spacing:-90px;
+		}
+		body {
+			overflow:hidden;
+		}
+	</style>
+	</head>
+	<body>
+		<div id="team"> </div>
+		<div id="wrapper" style="margin:2em;" class="clock flip-clock-wrapper">
+		
+		</div>
+		
+		<script type="text/javascript">
+			var items = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'.split('');
+			var specials = "_ ".split("");
+			var generate_item = function (id, i) {
+				var c = '';
+				var label = items[i];
+				//if (i==0) c = 'flip-clock-active';
+				//if (i==1) c = 'flip-clock-before';
+				var idl = label;
+				if (specials.indexOf(idl) != -1) idl = specials.indexOf(idl)*100;
+				return '<li id="' + id + '_' + idl + '" class="' + c + '">\
+							<a href="#">\
+								<div class="up">\
+									<div class="shadow"></div>\
+									<div class="inn">' + label + '</div>\
+								</div>\
+								<div class="down">\
+									<div class="shadow"></div>\
+									<div class="inn">' + label + '</div>\
+								</div>\
+							</a>\
+						</li>';
+			}
+			//var names = ["BABAK MEHRABI","MOHAMMAD MAHDAVI DOUST","HOSSEIN NASR","MEHRDAD BAKHTIARI","MOZHDEH ARYANNEZHAD","FOAD SAEEDINIK","MOHAMMAD MOEIN ZERAATKAR","SINA LABBAF","AIDA MOUSAVI","HOSSEIN ASGHARI","SARA JAVADZADEH","KASRA SAFARI","SHERVIN HAJI ESMAEILI","POUYAN MOMENI","MAHAN AZIZMOHAMMADI","EHSAN NAMDARI","SABA DADSETAN","EMAD MOLLAEI","FARZAD SHAFIEE"];
+				
+			var names = [
+				"HOSSEIN NASR",
+				"EMAD",
+				"BABAK",
+				"MOHAMMAD",
+				"MEHRDAD",
+				"MOZHDEH",
+				"FOAD",
+				"MOEIN",
+				"SINA",
+				"AIDA",
+				"HOSSEIN",
+				"SARA",
+				"KASRA",
+				"SHERVIN",
+				"POUYAN",
+				"NAVID",
+				"EHSAN",
+				"PARIYA",
+				"SIAVASH"
+			];
+			var tabani = false;
+			var LEN = 0;
+			for (var i=0;i<names.length;i++) {
+				LEN = Math.max(LEN, names[i].length);
+			}
+			var orig = [];
+			for (var i=0;i<names.length;i++) {
+				orig[i] = names[i];
+				if (names[i].length < LEN) names[i] += new Array(LEN-names[i].length+1).join(' ');
+			}
+			$(document).ready(function() {
+				for (var i=0;i<LEN;i++) {
+					var str = '<ul id="item_' + i + '" data-active="A" data-before="Z" class="flip play">';
+					for (var j=0;j<items.length;j++) {
+						str += generate_item("l_" + i, j);
+					}
+					str += "</ul>";
+					$("#wrapper").append(str);
+					$("#l_" + i + "_A").addClass("flip-clock-active");
+					$("#l_" + i + "_Z").addClass("flip-clock-before");
+				}
+			});
+			
+			function set(str) {
+				for (var i=0;i<str.length;i++) {
+					var act = $("#item_" + i).attr("data-active");
+					var bef = $("#item_" + i).attr("data-before");
+					var N = str[i];
+					if (specials.indexOf(N) != -1) N = specials.indexOf(N)*100;
+					if (act == N) continue;
+					$("#l_" + i + "_" + act).removeClass("flip-clock-active");
+					$("#l_" + i + "_" + act).addClass("flip-clock-before");
+					$("#l_" + i + "_" + bef).removeClass("flip-clock-before");
+					$("#l_" + i + "_" + N).addClass("flip-clock-active");
+					
+					$("#item_" + i).attr("data-active", N);
+					$("#item_" + i).attr("data-before", act);
+				}
+			}
+			function put(str, cb) {
+				var steps = Math.floor(Math.random()*30+30);
+				
+				var st = [];
+				for (var i=0;i<LEN;i++) {
+					st.push(Math.floor(Math.random()*(steps-20)+20));
+				}
+				
+				var strs = [];
+				for (var i=0;i<steps;i++) {
+					var curr = "";
+					var rnd = Math.floor(Math.random()*orig.length);
+					for (var j=0;j<LEN;j++) {
+						if (i > st[j]) curr += str[j];
+						else curr += (j<orig[rnd].length)?(orig[rnd][j]):(items[Math.floor(Math.random()*items.length)]);
+					}
+					strs.push(curr);
+				}
+				strs.push(str);
+				
+				strs.forEach(function (v, i) {
+					setTimeout(function () {
+						set(v);
+						if (i == strs.length-1) {
+							setTimeout(cb, 142);
+						}
+					}, i*142);
+				});
+			}
+			
+			var busy = true;
+			var started = false;
+			var splash = true;
+			var texts = [" AI CONTEST ", "   UT ACM   ", "AI CHALLENGE"];
+			var text_i = 0;
+			function early() {
+				if (started) {
+					put("  STARTING  ", function () {
+						splash = false;
+						busy = false;
+					});
+					return;
+				}
+				put(texts[text_i++%texts.length], function () {
+					setTimeout(function () {
+						early();
+					}, 4000);
+				});
+			}
+			early();
+			var team_index = 1;
+			$(function () {
+				
+				$("body").keydown(function (e) {
+					if (e.which == 13 && splash) {
+						started = true;
+						return;
+					}
+					
+					if (splash) return;
+					
+					if (e.which == 84) {
+						tabani = true;
+					}
+					if (busy) return;
+					if (e.which == 65) {
+						$("#team").html("");
+						put(" AI CONTEST ", function () {
+							busy = false;
+						});
+						return;
+					}
+					if (e.which == 32) {
+						busy = true;
+						var ok = 0;
+						for (var i=0;i<names.length;i++) if (names[i] != '~') ok++;
+						
+						if (ok == 0) {
+							$("#team").html("");
+							put(" AI CONTEST ", function () {
+								
+							});
+							return;
+						}
+						
+						var index = Math.floor(Math.random()*names.length);
+						if (tabani) index = 0;
+						while (names[index] == '~' || (index == 0 && !tabani && ok > 1)) index = Math.floor(Math.random()*names.length);
+						
+						$("#team").html("#"+team_index++);
+						
+						put(names[index], function () {
+							busy = false;
+							console.log("END");
+						});
+						names[index] = '~';
+					}
+				});
+
+			});
+		</script>
+		
+	
+ </body></html>
