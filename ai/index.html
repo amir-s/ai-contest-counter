@@ -202,8 +202,8 @@
 						}
 						
 						var index = Math.floor(Math.random()*names.length);
-						if (tabani) index = 0;
-						while (names[index] == '~' || (index == 0 && !tabani && ok > 1)) index = Math.floor(Math.random()*names.length);
+						
+						while (names[index] == '~') index = Math.floor(Math.random()*names.length);
 						
 						$("#team").html("#"+team_index++);
 						
